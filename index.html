@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Titan Gym POS Test</title>
+<style>
+body{font-family:Arial;background:#f5f7fb;padding:20px}
+.card{background:#fff;padding:20px;border-radius:15px;margin-bottom:15px}
+input,button{padding:10px;margin:4px;border-radius:8px}
+button{background:#111827;color:#fff;border:0}
+table{width:100%;background:#fff}
+td,th{padding:8px;border-bottom:1px solid #ddd}
+</style>
+</head>
+<body>
+<h1>TITAN GYM POS TEST</h1>
+
+<div class="card">
+<h3>Add Member</h3>
+<input id="name" placeholder="Name">
+<input id="contact" placeholder="Contact">
+<input id="plan" placeholder="Membership Plan">
+<input id="expiry" type="date">
+<button onclick="addMember()">Save Member</button>
+<p id="msg"></p>
+</div>
+
+<div class="card">
+Total Members: <b id="total">0</b><br>
+Active Members: <b id="active">0</b>
+</div>
+
+<div class="card">
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Plan</th><th>Expiry</th></tr></thead>
+<tbody id="list"></tbody>
+</table>
+</div>
+
+<script>
+const API="https://script.google.com/macros/s/AKfycbz9cwYl4Co3n31Lpov6T9MU_aTitTCWYBoqYoGirJebjL0GU9oAJFAfOvJAnunNN8gX/exec";
+
+async function addMember(){
+let data={action:"newmember",memberId:"TITAN-"+Date.now(),name:name.value,contact:contact.value,membershipPlan:plan.value,expiryDate:expiry.value};
+let r=await fetch(API,{method:"POST",body:JSON.stringify(data)});
+msg.innerText=await r.text();
+loadMembers();
+}
+
+async function loadMembers(){
+let r=await fetch(API+"?action=members");
+let j=await r.json();
+if(j.members){
+total.innerText=j.members.length-1;
+list.innerHTML="";
+let a=0;
+j.members.slice(1).forEach(x=>{if(x[6]=="ACTIVE")a++;list.innerHTML+=`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[3]}</td><td>${x[5]}</td></tr>`});
+active.innerText=a;
+}
+}
+loadMembers();
+</script>
+</body>
+</html>
