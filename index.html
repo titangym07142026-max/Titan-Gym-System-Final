@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TITAN GYM — Member POS & Renewal Monitor</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#101828;--muted:#667085;--line:#e4e7ec;--brand:#111827;--accent:#e11d2e;--green:#16a34a;--amber:#d97706;--red:#dc2626;--blue:#2563eb;--shadow:0 10px 28px rgba(16,24,40,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}
+.top{position:sticky;top:0;z-index:30;background:#111827;color:#fff;padding:12px 16px;box-shadow:0 4px 18px #0002}.topin{max-width:1400px;margin:auto;display:flex;align-items:center;gap:12px}.logo{font-weight:900;letter-spacing:.5px;font-size:18px}.sub{font-size:12px;color:#cbd5e1}.spacer{flex:1}.top button{background:#fff;color:#111827;border:0;border-radius:10px;padding:9px 12px;font-weight:700}
+.wrap{max-width:1400px;margin:auto;padding:18px}.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px}.hero h1{margin:0;font-size:28px}.hero p{margin:4px 0 0;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}.metric{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}.metric .n{font-size:28px;font-weight:900}.metric .l{font-size:12px;color:var(--muted);margin-top:4px}.metric.red{border-top:4px solid var(--red)}.metric.green{border-top:4px solid var(--green)}.metric.blue{border-top:4px solid var(--blue)}.metric.amber{border-top:4px solid var(--amber)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.toolbar{display:flex;gap:10px;flex-wrap:wrap;padding:14px;border-bottom:1px solid var(--line);align-items:center}.search{flex:1;min-width:220px}.search input,.toolbar select{width:100%;border:1px solid #d0d5dd;border-radius:10px;padding:10px 12px;background:#fff}.btn{border:1px solid #d0d5dd;background:#fff;border-radius:10px;padding:10px 13px;font-weight:700}.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}.btn.red{background:var(--accent);border-color:var(--accent);color:#fff}.btn.green{background:var(--green);border-color:var(--green);color:#fff}.btn.small{padding:7px 9px;font-size:12px}
+.tabs{display:flex;gap:6px;overflow:auto;padding:10px 14px;border-bottom:1px solid var(--line);background:#fafafa}.tab{border:0;background:transparent;padding:9px 12px;border-radius:9px;font-weight:800;white-space:nowrap}.tab.active{background:#111827;color:#fff}.count{opacity:.7}
+.tablewrap{overflow:auto;max-height:65vh}.table{width:100%;border-collapse:collapse;min-width:1050px}.table th,.table td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:13px;vertical-align:middle}.table th{position:sticky;top:0;background:#f8fafc;z-index:2;font-size:12px;text-transform:uppercase;color:#667085}.table tr:hover{background:#fafafa}.id{font-weight:900;color:#111827}.badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900}.b-active{background:#dcfce7;color:#166534}.b-ended{background:#fee2e2;color:#991b1b}.b-renewed{background:#dbeafe;color:#1d4ed8}.b-promo{background:#fef3c7;color:#92400e}.b-soon{background:#ffedd5;color:#9a3412}.muted{color:var(--muted)}.actions{display:flex;gap:5px;flex-wrap:wrap}.empty{padding:40px;text-align:center;color:var(--muted)}
+.modalbg{display:none;position:fixed;inset:0;background:#10182899;z-index:50;align-items:center;justify-content:center;padding:16px}.modalbg.show{display:flex}.modal{width:min(680px,100%);background:#fff;border-radius:18px;box-shadow:0 25px 80px #0005;overflow:hidden;max-height:92vh;display:flex;flex-direction:column}.modalhead{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modalbody{padding:18px;overflow:auto}.modalfoot{padding:14px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:5px;color:#344054}.field input,.field select,.field textarea{width:100%;padding:10px 11px;border:1px solid #d0d5dd;border-radius:10px}.field textarea{min-height:85px;resize:vertical}.full{grid-column:1/-1}.qrbox{text-align:center;padding:8px}.qrbox #qr{display:flex;justify-content:center;margin:10px}.qr-stage{position:relative;width:230px;height:230px;margin:auto;background:#fff}.qr-stage #qrCanvas{width:230px;height:230px;display:block}.qr-logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:46px;height:46px;object-fit:cover;border:4px solid #fff;border-radius:10px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);z-index:3}.qrtext{font-size:12px;line-height:1.5;color:#475467;white-space:pre-line}.close{border:0;background:#f2f4f7;border-radius:9px;padding:7px 10px;font-weight:900}
+.note{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;padding:10px;font-size:12px;color:#475467;margin-top:10px}.danger{color:#b42318}.success{color:#067647}.nowrap{white-space:nowrap}
+@media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.hero{display:block}.grid{grid-template-columns:1fr}.full{grid-column:auto}.wrap{padding:12px}.tablewrap{max-height:60vh}.topin{flex-wrap:wrap}.top .spacer{display:none}}
+@media(max-width:520px){.cards{grid-template-columns:1fr 1fr}.metric .n{font-size:23px}.hero h1{font-size:23px}.top button{padding:8px}}
+.spacer{flex:1}@media(max-width:700px){#qrReader{min-height:250px!important}.table{min-width:1200px}}\n</style>
+</head>
+<body>
+<header class="top"><div class="topin"><div><div class="logo">TITAN GYM</div><div class="sub">Member POS & Renewal Monitor</div></div><div class="spacer"></div><button onclick="openMember()">＋ Add Member</button><button onclick="openCloudSettings()">☁ Google Sheet</button><button onclick="syncNow()">↻ Sync Now</button><button onclick="exportJSON()">Backup JSON</button><button onclick="exportExcel()">Excel Export</button></div></header>
+<main class="wrap">
+<section class="hero"><div><h1>Member Dashboard</h1><p>Automatic ACTIVE / ENDED status is calculated strictly from the Due Date.</p></div><div class="muted" id="todayText"></div></section>
+<section class="cards"><div class="metric blue"><div class="n" id="mTotal">0</div><div class="l">Total Members</div></div><div class="metric green"><div class="n" id="mActive">0</div><div class="l">Active Members</div></div><div class="metric red"><div class="n" id="mEnded">0</div><div class="l">Ended Members</div></div><div class="metric blue"><div class="n" id="mRenewed">0</div><div class="l">Renewed Members</div></div><div class="metric amber"><div class="n" id="mPromo">0</div><div class="l">3-Month Promo</div></div></section>
+<section class="panel" style="margin-bottom:16px">
+<div class="toolbar"><strong>📷 QR CHECK-IN</strong><span class="muted" id="scanStatus">Scanner is OFF.</span><div class="spacer"></div><button class="btn green" onclick="startScanner()">Start Scanner</button><button class="btn" onclick="stopScanner()">Stop Scanner</button></div>
+<div style="padding:14px">
+<div style="display:grid;grid-template-columns:minmax(280px,420px) 1fr;gap:16px;align-items:start">
+<div>
+<div id="qrReader" style="width:100%;min-height:280px;background:#0f172a;border-radius:14px;overflow:hidden"></div>
+<div class="note">Each member may check in <b>once per day only</b>. The server checks the Google Sheet, so a second scan from another phone/device is also detected.</div>
+</div>
+<div id="scanResult" class="note">Scan a member QR to check in. The result will show the <b>Due Date</b> and <b>Days Remaining</b>.</div>
+</div>
+</div>
+</section>
+<section class="panel"><div class="tabs" id="tabs"></div><div class="toolbar"><div class="search"><input id="search" placeholder="Search Member ID, name, membership type, notes…" oninput="render()"></div><div style="width:160px"><select id="statusFilter" onchange="render()"><option value="all">All Status</option><option value="active">ACTIVE</option><option value="ended">ENDED</option></select></div><button class="btn primary" onclick="openMember()">＋ Add New Member</button><button class="btn" onclick="importJSONClick()">Import JSON</button><input id="jsonFile" type="file" accept="application/json,.json" hidden onchange="importJSON(event)"></div><div class="tablewrap"><table class="table"><thead><tr><th>Member ID</th><th>Name</th><th>Member Status</th><th>Membership</th><th>Due Date</th><th>Days Remaining</th><th>Status</th><th>Renewed</th><th>3-Month Promo</th><th>Amount</th><th>Notes</th><th>QR</th><th>Actions</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
+<div class="note">Master roster imported from the uploaded Titan Gym roster: <b>415 registered members</b> — 156 Regular, 229 Student, and 30 Regular + PT. All imported roster members are marked <b>OLD</b>. Regular + PT has its own tab. The Add Member form now lets you choose <b>NEW</b> or <b>OLD</b>. The source also reports 112 renewed, 141 claimed cards, and 110,900 total amount. fileciteturn5file0L40-L59</div>
+</main>
+
+<div class="modalbg" id="memberModal"><div class="modal"><div class="modalhead"><strong id="modalTitle">Add Member</strong><button class="close" onclick="closeModal('memberModal')">✕</button></div><form id="memberForm" onsubmit="saveMember(event)"><div class="modalbody"><div class="grid"><div class="field"><label>Member ID</label><input id="fId" readonly></div><div class="field"><label>Name *</label><input id="fName" required></div><div class="field"><label>Member Status *</label><select id="fMemberStatus"><option value="New">New</option><option value="Old">Old</option></select></div><div class="field"><label>Membership Type *</label><select id="fType"><option>Regular</option><option>Student</option><option>Regular + PT</option></select></div><div class="field"><label>Due Date *</label><input id="fDue" type="date" required></div><div class="field"><label>Amount</label><input id="fAmount" type="number" min="0" step="1"></div><div class="field"><label>Renewed?</label><select id="fRenewed"><option value="false">No</option><option value="true">Yes</option></select></div><div class="field"><label>3-Month Promo?</label><select id="fPromo"><option value="false">No</option><option value="true">Yes</option></select></div><div class="field"><label>Membership Card Claimed?</label><select id="fCard"><option value="false">No</option><option value="true">Yes</option></select></div><div class="field full"><label>Notes</label><textarea id="fNotes" placeholder="e.g. Free 1 month, Advance, Balance, special notes"></textarea></div></div><div class="note">Status is automatic: <b>ACTIVE</b> when Due Date is today or in the future; <b>ENDED</b> when Due Date has passed. Renewal and 3-month promo are separate monitoring flags.</div></div><div class="modalfoot"><button type="button" class="btn" onclick="closeModal('memberModal')">Cancel</button><button type="submit" class="btn primary">Save Member</button></div></form></div></div>
+
+
+<div class="modalbg" id="cloudModal"><div class="modal"><div class="modalhead"><strong>☁ Google Sheet Sync</strong><button class="close" onclick="closeModal('cloudModal')">✕</button></div><div class="modalbody">
+<div class="note"><b>Centralized Titan Gym database:</b> this POS uses your Apps Script Web App connected to the Google Sheet. Add, edit, delete, sync, and attendance can be shared across devices.</div>
+<div class="grid" style="margin-top:12px">
+<div class="field full"><label>Apps Script Web App URL</label><input id="cloudUrl" placeholder="https://script.google.com/macros/s/.../exec"></div>
+</div>
+<div id="cloudStatus" class="note">Google Sheet connection is ready.</div>
+</div><div class="modalfoot"><button class="btn" onclick="closeModal('cloudModal')">Cancel</button><button class="btn green" onclick="testAndSaveCloud()">Save & Test Connection</button></div></div></div>
+
+<div class="modalbg" id="qrModal"><div class="modal" style="max-width:420px"><div class="modalhead"><strong>Member QR Code</strong><button class="close" onclick="closeModal('qrModal')">✕</button></div><div class="modalbody"><div class="qrbox"><div id="qr"></div><div id="qrCaption" class="qrtext"></div><div id="qrMemberDetails" class="qrtext" style="margin-top:12px;text-align:left;background:#f8fafc;padding:12px;border-radius:10px"></div><div class="actions" style="justify-content:center;margin-top:12px"><button class="btn" onclick="printQR()">Print QR</button><button class="btn green" onclick="downloadMemberQR(qrMember?.id)">Download QR</button></div></div></div></div></div>
+
+<script>
+const API_URL_DEFAULT='https://script.google.com/macros/s/AKfycbzeONifQZPov9Q_IpHGuxs-NGzw2lf5IiA7bmHzcOJyzkclWvs7vOTcUjEstJZFMHl0fg/exec';
+const STORAGE='titanGymMembers_v3';
+const API_CONFIG_KEY='titanGymAppsScriptConfig_v1';
+const INITIAL=[{"id":"TITAN-0001","name":"Van Maravilla","membershipType":"Regular","due":"8/14","amount":500,"notes":"END","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0002","name":"Jason Alvarez","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0003","name":"Gabriel Encarnacion","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0004","name":"Baldo","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0005","name":"Jay-ar","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0006","name":"James Dayao","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0007","name":"Ike Lemindog","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0008","name":"Raymond Ramilo","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0009","name":"Joltaire Quinto","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0010","name":"Nicole Carriedo","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0011","name":"AJ Licarte","membershipType":"Student","due":"9/14","amount":null,"notes":"Free 1 month 0","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0012","name":"Wilmar","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0013","name":"Jabber","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0014","name":"Cedrick","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0015","name":"Ron","membershipType":"Regular","due":"9/14","amount":null,"notes":"2 months 0","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0016","name":"Althea","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0017","name":"Carl","membershipType":"Regular + PT","due":"8/3","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0018","name":"Samantha","membershipType":"Regular + PT","due":"8/3","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0019","name":"Cesar","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0020","name":"JV","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0021","name":"Kenneth","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0022","name":"James","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0023","name":"Jeric","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0024","name":"Nathan","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0025","name":"Aram","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0026","name":"Rafael","membershipType":"Student","due":"9/14","amount":null,"notes":"2 months 0","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0027","name":"Allen","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0028","name":"Rainiel","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0029","name":"Alyssa","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0030","name":"Manuel","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0031","name":"Jhugs","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0032","name":"Gio","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0033","name":"Cristan Mandayo","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0034","name":"Josh","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0035","name":"Esconebrá, Vincent","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0036","name":"Sultan","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0037","name":"Miguel Guce","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0038","name":"Mary Rose","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0039","name":"Rovic","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0040","name":"Yoshabel","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0041","name":"Marc Joven","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0042","name":"Jameela","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0043","name":"Jes","membershipType":"Regular + PT","due":"8/5","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0044","name":"Arjay","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0045","name":"Jortz","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0046","name":"Jenn","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0047","name":"Ericka","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0048","name":"Dexson John","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0049","name":"JC Dela Torre","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0050","name":"Mateo","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0051","name":"Horace","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0052","name":"Franz","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0053","name":"Deogracias Rafael","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0054","name":"R-chie","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0055","name":"Andrew Asug","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0056","name":"Allen Arañez","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0057","name":"Kristoff Janda","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0058","name":"Mark","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0059","name":"Ivan","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0060","name":"Kevin Almendras","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0061","name":"Kirk Evan Sajines","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0062","name":"Jhun Mart","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0063","name":"Gordon","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0064","name":"John Benedick","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0065","name":"Gerald","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0066","name":"Butoy / Enrik","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0067","name":"Oom","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0068","name":"Jason Feliciano","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0069","name":"Joshua Manalo","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0070","name":"Kim Reginio","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0071","name":"Paul","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0072","name":"Daniel","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0073","name":"Mark","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0074","name":"Jarred","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0075","name":"Meynard","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0076","name":"Kirby","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0077","name":"Aid","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0078","name":"Karl","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0079","name":"Paul Lirio","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0080","name":"Adrian","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0081","name":"Reeve Enzo Dela Cruz","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0082","name":"Fernan","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0083","name":"Soriano","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0084","name":"Sangalang","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0085","name":"Justine Balantad","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0086","name":"Nilo Peñaranda","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0087","name":"Xander","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0088","name":"Niña","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0089","name":"Hanz","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0090","name":"Victor Villamor","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0091","name":"Melvin","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0092","name":"Allen","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0093","name":"Thon Jonard","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0094","name":"Joel Lat","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0095","name":"Beau","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0096","name":"Geoffray","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0097","name":"Julius Mendoza","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0098","name":"Shayne Dedios","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0099","name":"Domo","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0100","name":"Badz","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0101","name":"JR","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0102","name":"Ace Macatangay","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0103","name":"CY","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0104","name":"Burgos A","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0105","name":"Adatan, Jes","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0106","name":"Tonton","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0107","name":"Ryan A","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0108","name":"Marcus","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0109","name":"Wes","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0110","name":"GAB","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0111","name":"Rudy Austria","membershipType":"Regular","due":"8/14","amount":500,"notes":"₱200 Balance","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0112","name":"Cyrus Medel","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0113","name":"Karl Avelino","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0114","name":"Rhaye","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0115","name":"Nikko","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0116","name":"JK","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0117","name":"Bea","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0118","name":"Rachel","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0119","name":"Tina","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0120","name":"JM","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0121","name":"Yuan","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0122","name":"Moritz","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0123","name":"Justin Rodriguez","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0124","name":"Marco","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0125","name":"Ivan","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0126","name":"Vic","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0127","name":"MG","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0128","name":"Richelle Helim","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0129","name":"Wilbert","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0130","name":"Arif","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0131","name":"Jiane Vicencio","membershipType":"Student","due":"8/14","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0132","name":"Justin JAY","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0133","name":"Bogs","membershipType":"Regular","due":"8/14","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0134","name":"Zernan","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0135","name":"Mark Tristan Dagli","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0136","name":"Lester","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0137","name":"John Kevin E.","membershipType":"Student","due":"9/14","amount":null,"notes":"Free 1 mo. 0","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0138","name":"Jinky","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0139","name":"Quiel","membershipType":"Student","due":"8/14","amount":400,"notes":"NOT YET PAID","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0140","name":"Tristan Hernandez","membershipType":"Regular","due":"8/15","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0141","name":"Erwin","membershipType":"Regular + PT","due":"8/15","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0142","name":"Kervin Juarez","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0143","name":"Reyes Don","membershipType":"Student","due":"8/15","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0144","name":"Bryle","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0145","name":"EJ Moreno","membershipType":"Student","due":"8/14","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0146","name":"Vilmar","membershipType":"Regular","due":"8/15","amount":null,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0147","name":"James","membershipType":"Student","due":"8/15","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0148","name":"Espijon","membershipType":"Regular","due":"8/15","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0149","name":"Sheldon","membershipType":"Regular","due":"8/15","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0150","name":"Matt","membershipType":"Student","due":"8/16","amount":400,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0151","name":"Jezrel C","membershipType":"Regular","due":"8/18","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0152","name":"Akil","membershipType":"Student","due":"8/18","amount":400,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0153","name":"Macala","membershipType":"Student","due":"8/18","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0154","name":"Arnel Castillo","membershipType":"Regular","due":"8/19","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0155","name":"Renz Rivera","membershipType":"Student","due":"8/19","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0156","name":"NIKKO","membershipType":"Student","due":"8/20","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0157","name":"Jomar","membershipType":"Student","due":"8/20","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0158","name":"Lester Apostol","membershipType":"Student","due":"8/20","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0159","name":"Justin Alpapara","membershipType":"Student","due":"8/20","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0160","name":"Tyron","membershipType":"Student","due":"8/20","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0161","name":"Paul Cañete","membershipType":"Student","due":"8/20","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0162","name":"Kyle Basbas","membershipType":"Student","due":"8/20","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0163","name":"Matt Stephen Asis","membershipType":"Student","due":"8/20","amount":400,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0164","name":"Raymart Fetisan","membershipType":"Regular","due":"8/20","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0165","name":"Matt Espiritu","membershipType":"Student","due":"8/20","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0166","name":"Axcel","membershipType":"Student","due":"8/21","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0167","name":"Adonis","membershipType":"Regular","due":"8/21","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0168","name":"John Carlo Lirio","membershipType":"Student","due":"8/21","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0169","name":"Ian Carlo Malapad","membershipType":"Student","due":"8/21","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0170","name":"Yukie","membershipType":"Student","due":"8/22","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0171","name":"Hannah","membershipType":"Regular","due":"8/23","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0172","name":"Barron","membershipType":"Regular","due":"8/23","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0173","name":"Neal Ladiana","membershipType":"Student","due":"8/23","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0174","name":"Luke Salas","membershipType":"Student","due":"8/23","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0175","name":"Joshua Malabanan","membershipType":"Regular","due":"8/23","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0176","name":"Keith","membershipType":"Regular + PT","due":"8/23","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0177","name":"Maryhls","membershipType":"Regular + PT","due":"8/23","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0178","name":"Tala","membershipType":"Student","due":"8/24","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0179","name":"Kirby","membershipType":"Student","due":"8/24","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0180","name":"Kelly","membershipType":"Student","due":"8/24","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0181","name":"Jared","membershipType":"Student","due":"8/26","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0182","name":"Japoy","membershipType":"Regular","due":"8/26","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0183","name":"Camille","membershipType":"Student","due":"8/26","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0184","name":"Jed Rubio","membershipType":"Student","due":"8/27","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0185","name":"Lance Sacdalan","membershipType":"Student","due":"8/27","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0186","name":"Jayve Jarme","membershipType":"Regular","due":"8/27","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0187","name":"Deo Carpio","membershipType":"Regular","due":"8/14","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0188","name":"Justin Gapan","membershipType":"Regular","due":"8/27","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0189","name":"Gabriel Gapan","membershipType":"Student","due":"8/27","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0190","name":"Lee Van Navarro","membershipType":"Student","due":"8/27","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0191","name":"Rod Ternida","membershipType":"Regular","due":"8/27","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0192","name":"Amer","membershipType":"Student","due":"8/27","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0193","name":"Sonia","membershipType":"Regular","due":"8/28","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0194","name":"Bebit Medina","membershipType":"Regular + PT","due":"8/28","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0195","name":"Babylit Medina","membershipType":"Regular + PT","due":"8/28","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0196","name":"Lucas Medina","membershipType":"Regular","due":"8/28","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0197","name":"Raymond 2","membershipType":"Regular","due":"8/28","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0198","name":"Elvin","membershipType":"Student","due":"8/28","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0199","name":"Tajimar Muharrani","membershipType":"Regular","due":"8/28","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0200","name":"Jay Bobijes","membershipType":"Regular","due":"8/28","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0201","name":"JV","membershipType":"Regular","due":"8/28","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0202","name":"Prince Tel","membershipType":"Regular + PT","due":"8/28","amount":400,"notes":"RENEWAL ON HOLD","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0203","name":"Vladimir","membershipType":"Regular + PT","due":"8/28","amount":400,"notes":"RENEWAL ON HOLD","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0204","name":"Lynee","membershipType":"Regular","due":"8/28","amount":450,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0205","name":"Elvin","membershipType":"Regular","due":"8/28","amount":450,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0206","name":"Jamel","membershipType":"Regular","due":"8/28","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0207","name":"Daradean Ytac","membershipType":"Regular + PT","due":"8/29","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0208","name":"Richard Michael Lara","membershipType":"Regular","due":"8/30","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0209","name":"Lazarus","membershipType":"Regular","due":"8/30","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0210","name":"Jhonattan","membershipType":"Regular","due":"8/30","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0211","name":"Edz Venoya","membershipType":"Regular + PT","due":"8/30","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0212","name":"Dave Balba","membershipType":"Regular","due":"8/31","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0213","name":"Saipoden","membershipType":"Regular","due":"8/31","amount":500,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0214","name":"Heart","membershipType":"Student","due":"8/31","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0215","name":"Kurt","membershipType":"Student","due":"9/1","amount":400,"notes":"END","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0216","name":"Michelle Macarubbo","membershipType":"Regular + PT","due":"9/1","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0217","name":"Jhamela Onte","membershipType":"Regular + PT","due":"9/1","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0218","name":"Brent Castillo","membershipType":"Student","due":"9/3","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0219","name":"Alvin James Dejan","membershipType":"Student","due":"9/3","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0220","name":"Ronnel Jaurique","membershipType":"Regular","due":"9/3","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0221","name":"Aldrich Precilla","membershipType":"Student","due":"9/3","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0222","name":"Jan Rovic Magsino","membershipType":"Student","due":"9/3","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0223","name":"Adrian Galindez","membershipType":"Student","due":"9/3","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0224","name":"JM Sanchez","membershipType":"Regular","due":"9/3","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0225","name":"Noel Barcasio","membershipType":"Regular","due":"9/3","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0226","name":"Pia Carandang","membershipType":"Regular","due":"9/3","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0227","name":"Erica","membershipType":"Regular + PT","due":"9/3","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0228","name":"Gine","membershipType":"Regular + PT","due":"9/3","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0229","name":"Neal Santiago","membershipType":"Regular","due":"9/4","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0230","name":"Archie D.","membershipType":"Regular","due":"9/4","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0231","name":"Rhandel Platon","membershipType":"Student","due":"9/4","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0232","name":"Ivan Carandang","membershipType":"Student","due":"9/4","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0233","name":"Mark Lloyd Oñate","membershipType":"Student","due":"9/4","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0234","name":"Raym Paña","membershipType":"Regular","due":"9/4","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0235","name":"Lanz Guevarra","membershipType":"Student","due":"9/4","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0236","name":"Genesis Lirio","membershipType":"Student","due":"9/5","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0237","name":"Marthe Pecana","membershipType":"Regular","due":"9/5","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0238","name":"Marcelino","membershipType":"Regular + PT","due":"9/5","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0239","name":"Darwin Villegas","membershipType":"Regular + PT","due":"9/5","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0240","name":"Randell","membershipType":"Regular","due":"9/5","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0241","name":"Albert Del Mundo","membershipType":"Regular","due":"9/5","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0242","name":"Missy","membershipType":"Regular","due":"9/6","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0243","name":"Bianca Balog","membershipType":"Regular","due":"9/6","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0244","name":"Ruthie Gacis","membershipType":"Regular","due":"9/6","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0245","name":"Miguel Miaque","membershipType":"Student","due":"9/6","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0246","name":"Arianne Olasiman","membershipType":"Student","due":"9/7","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0247","name":"Ehdrian Robles","membershipType":"Student","due":"9/7","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0248","name":"Nick Elacion","membershipType":"Student","due":"9/8","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0249","name":"Eleazar Almacen","membershipType":"Student","due":"9/8","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0250","name":"Reynard Tobana","membershipType":"Student","due":"9/10","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0251","name":"Glenn Sambajon","membershipType":"Regular","due":"9/11","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0252","name":"David Dizon","membershipType":"Regular","due":"9/11","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0253","name":"Junnel Fernandez","membershipType":"Regular","due":"9/10","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0254","name":"Angelo Manoguid","membershipType":"Student","due":"9/10","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0255","name":"Neiro Lacerna","membershipType":"Student","due":"9/10","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0256","name":"Justin Cuadra","membershipType":"Student","due":"9/10","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0257","name":"Clinton Malabanan","membershipType":"Student","due":"9/10","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0258","name":"Marc Marqueses","membershipType":"Student","due":"9/10","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0259","name":"Kyle Gonzales","membershipType":"Student","due":"9/11","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0260","name":"Dan Manzanero","membershipType":"Regular","due":"9/11","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0261","name":"Christian Zarate","membershipType":"Regular","due":"12/12","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":true,"memberStatus":"Old"},{"id":"TITAN-0262","name":"Vhec Zarate","membershipType":"Regular","due":"12/12","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":true,"memberStatus":"Old"},{"id":"TITAN-0263","name":"Allen Lunizo","membershipType":"Student","due":"9/12","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0264","name":"Charlize Mojares","membershipType":"Student","due":"9/12","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0265","name":"Mary Jane Glory","membershipType":"Regular + PT","due":"9/12","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0266","name":"Jacob Wallberg","membershipType":"Regular","due":"9/12","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0267","name":"John Rodchell Gaban","membershipType":"Student","due":"9/12","amount":400,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0268","name":"Yam Aryl Villanueva","membershipType":"Regular","due":"9/12","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0269","name":"Jhasper Josh","membershipType":"Student","due":"9/13","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0270","name":"John Cedric Manalo","membershipType":"Student","due":"9/13","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0271","name":"Mark Ivan Garcia","membershipType":"Student","due":"9/13","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0272","name":"Jerry Alba","membershipType":"Regular","due":"9/13","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0273","name":"Rjay Manayuba","membershipType":"Regular","due":"9/14","amount":500,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0274","name":"Alexis Dorado","membershipType":"Student","due":"9/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0275","name":"Lae Rolloqui","membershipType":"Student","due":"9/14","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0276","name":"Mary Ann Bawit","membershipType":"Regular + PT","due":"9/14","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0277","name":"Ariane Arabes","membershipType":"Regular + PT","due":"9/14","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0278","name":"Gabrielle Advincula","membershipType":"Regular + PT","due":"9/14","amount":500,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0279","name":"Prince Ricky Sanchez","membershipType":"Student","due":"9/15","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0280","name":"Marcus Quiambao","membershipType":"Student","due":"9/15","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0281","name":"Philip Reyes","membershipType":"Regular","due":"9/16","amount":500,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0282","name":"Jonas Obnial","membershipType":"Student","due":"9/16","amount":400,"notes":"","cardClaimed":true,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0283","name":"Louie Gamboa","membershipType":"Student","due":"9/17","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0284","name":"Rain Ramilo","membershipType":"Student","due":"9/17","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0285","name":"Jasmine Moral","membershipType":"Student","due":"9/17","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0286","name":"Ralph Ivan Canlubo","membershipType":"Student","due":"9/17","amount":400,"notes":"","cardClaimed":true,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0287","name":"Dhanlowel Lugo","membershipType":"Student","due":"9/17","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0288","name":"Jimuel Malitig","membershipType":"Student","due":"9/17","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0289","name":"Kiel Dalangin","membershipType":"Student","due":"9/17","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0290","name":"Ej Uranza","membershipType":"Student","due":"9/17","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0291","name":"Jerson Javier","membershipType":"Student","due":"9/17","amount":400,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0292","name":"Reyden Maceda","membershipType":"Student","due":"9/17","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0293","name":"Jonas Tulpo","membershipType":"Student","due":"9/17","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0294","name":"Editha Camado","membershipType":"Student","due":"9/17","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0295","name":"Yuji","membershipType":"Student","due":"9/17","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0296","name":"Tejay Hernandez","membershipType":"Student","due":"9/17","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0297","name":"Rizhel Bobis","membershipType":"Regular","due":"9/17","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0298","name":"Joshua Martinez","membershipType":"Regular","due":"9/17","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0299","name":"Angel Tuyay","membershipType":"Student","due":"9/17","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0300","name":"Cyrus Benjamin","membershipType":"Student","due":"9/18","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0301","name":"Donly Casanova","membershipType":"Student","due":"9/18","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0302","name":"Liam Lura","membershipType":"Student","due":"9/19","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0303","name":"Richard Glory","membershipType":"Regular","due":"9/19","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0304","name":"Dea Buena","membershipType":"Regular","due":"9/19","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0305","name":"Matt Carandang","membershipType":"Student","due":"9/19","amount":null,"notes":"","cardClaimed":false,"renewed":true,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0306","name":"Mye","membershipType":"Regular + PT","due":"9/19","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0307","name":"Jhay Bengua","membershipType":"Regular","due":"9/19","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0308","name":"Albert John","membershipType":"Regular","due":"9/19","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0309","name":"Joriz Mabilangan","membershipType":"Regular","due":"9/20","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0310","name":"Jose Durolfo","membershipType":"Regular","due":"9/20","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0311","name":"Ryan Jhay","membershipType":"Regular","due":"9/20","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0312","name":"Russel Dave","membershipType":"Regular","due":"9/20","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0313","name":"Ernie Ramilo","membershipType":"Regular","due":"9/20","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0314","name":"Takeo Teio","membershipType":"Student","due":"9/20","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0315","name":"Sean Belotendos","membershipType":"Student","due":"9/20","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0316","name":"Yugene Errol Lopez","membershipType":"Student","due":"9/21","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0317","name":"Renz Rivera","membershipType":"Student","due":"9/22","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0318","name":"Judson Enriquez","membershipType":"Student","due":"9/22","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0319","name":"Jio Lopez","membershipType":"Regular","due":"9/24","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0320","name":"Aolj Burgos","membershipType":"Student","due":"9/24","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0321","name":"Neil Mercado","membershipType":"Student","due":"9/24","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0322","name":"John Francis","membershipType":"Student","due":"9/25","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0323","name":"Daniel Mandado","membershipType":"Regular","due":"9/25","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0324","name":"Andrew Yson","membershipType":"Student","due":"9/25","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0325","name":"Wyngard","membershipType":"Student","due":"9/25","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0326","name":"Patricia Santos","membershipType":"Student","due":"9/25","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0327","name":"Julius Andrei Morales","membershipType":"Student","due":"9/25","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0328","name":"Lianne Javier","membershipType":"Student","due":"9/26","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0329","name":"Shantelle - Taekwondo","membershipType":"Student","due":"9/26","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0330","name":"Jessam Monzor","membershipType":"Student","due":"9/26","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0331","name":"King Vincent","membershipType":"Regular","due":"9/26","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0332","name":"Rachel","membershipType":"Regular + PT","due":"9/26","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0333","name":"Kanoska","membershipType":"Student","due":"9/26","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0334","name":"DM Ary","membershipType":"Student","due":"9/26","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0335","name":"Zane Sangkupal","membershipType":"Student","due":"9/26","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0336","name":"Zyldjiane Cleofe","membershipType":"Student","due":"9/27","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0337","name":"Lister","membershipType":"Regular","due":"9/28","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0338","name":"Angel Cabanglan","membershipType":"Student","due":"9/28","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0339","name":"Mico Beaucillo","membershipType":"Student","due":"9/30","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0340","name":"Dwyane Baclig","membershipType":"Student","due":"9/30","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0341","name":"Alyssa Mae Yugo","membershipType":"Student","due":"9/30","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0342","name":"Roan Ortilla","membershipType":"Student","due":"9/30","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0343","name":"Patrick Manzanero","membershipType":"Student","due":"9/30","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0344","name":"Ace Abu","membershipType":"Regular + PT","due":"9/30","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0345","name":"Christina Abu","membershipType":"Regular + PT","due":"9/30","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0346","name":"Carl Peña","membershipType":"Student","due":"9/30","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0347","name":"John Clark Onde","membershipType":"Student","due":"9/30","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0348","name":"John Marvin","membershipType":"Student","due":"9/30","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0349","name":"Juan Carlos Magsino","membershipType":"Student","due":"9/30","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0350","name":"John Christopher","membershipType":"Student","due":"9/30","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0351","name":"Carms","membershipType":"Student","due":"10/1","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0352","name":"Jessryl Olivarez","membershipType":"Student","due":"10/1","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0353","name":"Jeff Rae","membershipType":"Regular","due":"10/1","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0354","name":"Mike Harvy Diaz","membershipType":"Student","due":"10/1","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0355","name":"Jay Rosales","membershipType":"Regular","due":"10/2","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0356","name":"Danielle Papina","membershipType":"Student","due":"10/2","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0357","name":"Adrian Capacete","membershipType":"Regular","due":"10/2","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0358","name":"Jaymar Tesado","membershipType":"Student","due":"12/2","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":true,"memberStatus":"Old"},{"id":"TITAN-0359","name":"Ma. Christina Amurao","membershipType":"Student","due":"12/2","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":true,"memberStatus":"Old"},{"id":"TITAN-0360","name":"Dan Barranda","membershipType":"Student","due":"10/3","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0361","name":"CK Molinyawe","membershipType":"Student","due":"10/3","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0362","name":"Adrian Cayoyong","membershipType":"Student","due":"10/3","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0363","name":"John Carlo Evangelista","membershipType":"Student","due":"10/4","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0364","name":"Jake Platon","membershipType":"Student","due":"10/2","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0365","name":"Syruz Villeta","membershipType":"Student","due":"10/4","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0366","name":"Vanessa Abare","membershipType":"Student","due":"10/5","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0367","name":"Jamilla Cuarto","membershipType":"Student","due":"10/5","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0368","name":"Jeric Tuiza","membershipType":"Regular","due":"10/6","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0369","name":"JJ Salcedo","membershipType":"Student","due":"10/7","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0370","name":"Ernest Villarreal","membershipType":"Student","due":"10/7","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0371","name":"Joel Gonzales","membershipType":"Student","due":"10/7","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0372","name":"Patrick Ramos","membershipType":"Student","due":"10/7","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0373","name":"Dominic Castillo","membershipType":"Regular","due":"10/7","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0374","name":"Kean Lacuarin","membershipType":"Regular","due":"10/7","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0375","name":"Mark Ryan Bernabe","membershipType":"Regular","due":"10/7","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0376","name":"Rhei Macahia","membershipType":"Student","due":"10/7","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0377","name":"Victor Maluping","membershipType":"Student","due":"10/7","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0378","name":"Mheiel Galas","membershipType":"Student","due":"10/7","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0379","name":"Roehan Maranan","membershipType":"Student","due":"10/8","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0380","name":"Raven Sison","membershipType":"Student","due":"10/8","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0381","name":"Gelo Lucilo","membershipType":"Student","due":"10/8","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0382","name":"Marvin Marcelo","membershipType":"Regular","due":"10/8","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0383","name":"Mike Delta","membershipType":"Regular","due":"12/8","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":true,"memberStatus":"Old"},{"id":"TITAN-0384","name":"Jared Tomagos","membershipType":"Student","due":"10/9","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0385","name":"Isaiah Calatin","membershipType":"Regular","due":"10/9","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0386","name":"Sam Wilson Segara","membershipType":"Student","due":"10/10","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0387","name":"John Mark Narra","membershipType":"Student","due":"10/10","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0388","name":"Marc Janell Perilla","membershipType":"Regular","due":"10/11","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0389","name":"Ian Falcatan","membershipType":"Regular","due":"10/11","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0390","name":"Allan Mercado","membershipType":"Student","due":"10/11","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0391","name":"Trisha Timog","membershipType":"Student","due":"10/12","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0392","name":"Glenn Agno","membershipType":"Student","due":"10/12","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0393","name":"Geline Manalo","membershipType":"Student","due":"10/12","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0394","name":"Josh Lumicday","membershipType":"Regular","due":"10/12","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0395","name":"Shermil Segara","membershipType":"Student","due":"10/12","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0396","name":"Raul","membershipType":"Regular","due":"10/12","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0397","name":"Lovely Talaguit","membershipType":"Student","due":"10/13","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0398","name":"Pia- PT GRAY","membershipType":"Regular","due":"12/14","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":true,"memberStatus":"Old"},{"id":"TITAN-0399","name":"George Shinraku","membershipType":"Regular","due":"10/14","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0400","name":"Greg Santillan","membershipType":"Regular","due":"12/14","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":true,"memberStatus":"Old"},{"id":"TITAN-0401","name":"Kervin Caraan","membershipType":"Regular","due":"10/14","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0402","name":"Christian David","membershipType":"Student","due":"10/14","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0403","name":"Rhei Panghulan","membershipType":"Student","due":"10/15","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0404","name":"Dustin Landicho","membershipType":"Regular","due":"10/15","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0405","name":"Arnel John Erit","membershipType":"Regular","due":"10/16","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0406","name":"Honey Aniel","membershipType":"Regular","due":"10/16","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0407","name":"Christopher Aquino","membershipType":"Regular","due":"10/16","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0408","name":"Alvin Luna","membershipType":"Regular","due":"10/16","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0409","name":"Russel Mclean Sentiles","membershipType":"Student","due":"10/16","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0410","name":"Ysabelle Inoncillo","membershipType":"Regular + PT","due":"10/16","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0411","name":"Maryann Rodriquez","membershipType":"Regular + PT","due":"10/16","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0412","name":"Justine Natividad","membershipType":"Regular + PT","due":"10/16","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0413","name":"Haydee Terrones","membershipType":"Regular + PT","due":"10/16","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0414","name":"Reyel Soterania","membershipType":"Regular","due":"10/17","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"},{"id":"TITAN-0415","name":"Shelvin Vilan","membershipType":"Regular","due":"10/17","amount":null,"notes":"","cardClaimed":false,"renewed":false,"promo3m":false,"memberStatus":"Old"}];
+let members=[];
+let activeTab='all';
+let editingId=null;
+let qrMember=null;
+let scanner=null;
+let scanning=false;
+
+const tabs=[
+  ['all','All Members'],
+  ['regular','Regular'],
+  ['student','Student'],
+  ['pt','Regular + PT'],
+  ['active','Active'],
+  ['ended','Ended'],
+  ['renewed','Renewed'],
+  ['promo','3-Month Promo'],
+  ['new','New Members'],
+  ['old','Old Members']
+];
+
+function getApiUrl(){
+  return localStorage.getItem(API_CONFIG_KEY)||API_URL_DEFAULT;
+}
+function setApiUrl(v){localStorage.setItem(API_CONFIG_KEY,String(v||'').trim());}
+function openCloudSettings(){
+  document.getElementById('cloudUrl').value=getApiUrl();
+  cloudSetStatus('Google Sheet sync is ready.','success');
+  document.getElementById('cloudModal').classList.add('show');
+}
+function cloudSetStatus(msg,cls=''){
+  const el=document.getElementById('cloudStatus');
+  if(el){el.textContent=msg;el.className='note '+cls;}
+}
+async function testAndSaveCloud(){
+  const url=document.getElementById('cloudUrl').value.trim();
+  if(!url){cloudSetStatus('Please enter the Apps Script Web App URL.','danger');return;}
+  setApiUrl(url);
+  try{
+    const r=await fetch(url+'?action=ping',{cache:'no-store'});
+    const d=await r.json();
+    if(!d.ok)throw Error(d.message||'API test failed');
+    cloudSetStatus('Connected to Titan Gym Google Sheet.','success');
+    alert('Google Sheet connection successful.');
+    closeModal('cloudModal');
+  }catch(e){
+    cloudSetStatus('Connection failed: '+(e.message||e),'danger');
+  }
+}
+async function apiGet(action,params={}){
+  const u=new URL(getApiUrl());
+  u.searchParams.set('action',action);
+  Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v??''));
+  const r=await fetch(u.toString(),{cache:'no-store'});
+  const d=await r.json();
+  if(!r.ok||d.ok===false && action!=='attendance') {
+    if(d.message==='Member not found') return d;
+    throw Error(d.error||d.message||'API request failed');
+  }
+  return d;
+}
+async function apiPost(payload){
+  const r=await fetch(getApiUrl(),{
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(payload)
+  });
+  const d=await r.json();
+  if(!r.ok)throw Error(d.error||d.message||'API request failed');
+  return d;
+}
+function apiMemberToLocal(x){
+  return {
+    id:String(x['Member ID']||x.id||'').trim().toUpperCase(),
+    name:String(x['Name']||x.name||''),
+    memberStatus:String(x['Member Status']||x.memberStatus||'Old'),
+    membershipType:String(x['Membership Plan']||x['Membership']||x.membershipType||'Regular'),
+    due:toShortDate(x['Expiry Date']||x.due||''),
+    amount:x['Amount']===''||x['Amount']==null?null:Number(x['Amount']),
+    notes:String(x['Notes']||x.notes||''),
+    cardClaimed:!!(x['Card Claimed']===true||String(x['Card Claimed']).toLowerCase()==='yes'||String(x['Card Claimed']).toLowerCase()==='true'),
+    renewed:!!(x['Renewed']===true||String(x['Renewed']).toLowerCase()==='yes'||String(x['Renewed']).toLowerCase()==='true'),
+    promo3m:!!(x['3-Month Promo']===true||String(x['3-Month Promo']).toLowerCase()==='yes'||String(x['3-Month Promo']).toLowerCase()==='true'),
+    pin:String(x['PIN']||''),
+    lastVisit:String(x['Last Visit']||''),
+    totalVisits:Number(x['Total Visits']||0)
+  };
+}
+function toShortDate(v){
+  if(!v)return '';
+  const s=String(v);
+  const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(iso)return `${Number(iso[2])}/${Number(iso[3])}`;
+  const m=s.match(/^(\d{1,2})\/(\d{1,2})/);
+  if(m)return `${Number(m[1])}/${Number(m[2])}`;
+  const d=new Date(s);
+  if(!isNaN(d))return `${d.getMonth()+1}/${d.getDate()}`;
+  return s;
+}
+function localToApi(m,action){
+  return {
+    action,
+    id:m.id,
+    name:m.name,
+    memberStatus:m.memberStatus||'Old',
+    plan:m.membershipType||'Regular',
+    membershipType:m.membershipType||'Regular',
+    expiry:isoFromDue(m.due||''),
+    due:m.due||'',
+    amount:m.amount==null?'':m.amount,
+    notes:m.notes||'',
+    cardClaimed:!!m.cardClaimed,
+    renewed:!!m.renewed,
+    promo3m:!!m.promo3m,
+    pin:m.pin||''
+  };
+}
+async function syncNow(){
+  const btn=[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Sync Now'));
+  if(btn)btn.disabled=true;
+  try{
+    const d=await apiGet('members');
+    const remote=(d.members||[]).map(apiMemberToLocal).filter(m=>m.id);
+    if(remote.length){
+      members=remote;
+      save();
+      render();
+      alert(`Synced successfully from Google Sheet.\n${remote.length} members loaded.`);
+    }else{
+      await uploadAllToSheet();
+      alert('Google Sheet was empty, so the current POS roster was uploaded.');
+    }
+  }catch(e){
+    alert('Google Sheet sync failed.\n'+(e.message||e));
+  }finally{
+    if(btn)btn.disabled=false;
+  }
+}
+async function uploadAllToSheet(){
+  for(const m of members){
+    await apiPost(localToApi(m,'update'));
+  }
+}
+async function load(){
+  try{
+    const s=localStorage.getItem(STORAGE);
+    members=s?JSON.parse(s):INITIAL.map(x=>({...x}));
+  }catch(e){members=INITIAL.map(x=>({...x}));}
+  document.getElementById('todayText').textContent='Today: '+fmtDate(new Date());
+  render();
+  try{
+    const d=await apiGet('members');
+    const remote=(d.members||[]).map(apiMemberToLocal).filter(m=>m.id);
+    if(remote.length){
+      members=remote;
+      save();
+      render();
+    }else{
+      await uploadAllToSheet();
+    }
+  }catch(e){
+    console.warn('Google Sheet auto-sync skipped:',e);
+  }
+}
+function save(){localStorage.setItem(STORAGE,JSON.stringify(members));}
+function dateObj(v){
+  if(!v)return null;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(v))return new Date(v+'T23:59:59');
+  let m=String(v).match(/^(\d{1,2})\/(\d{1,2})$/);
+  if(m)return new Date(2026,+m[1]-1,+m[2],23,59,59);
+  const d=new Date(v);
+  return isNaN(d)?null:d;
+}
+function fmtDate(d){
+  if(!d)return '—';
+  return new Intl.DateTimeFormat('en-PH',{year:'numeric',month:'short',day:'numeric'}).format(d);
+}
+function statusOf(m){
+  let d=dateObj(m.due);
+  if(!d)return 'ENDED';
+  return d>=new Date(new Date().setHours(0,0,0,0))?'ACTIVE':'ENDED';
+}
+function daysLeft(m){
+  let d=dateObj(m.due);
+  if(!d)return null;
+  let t=new Date();t.setHours(0,0,0,0);
+  return Math.ceil((d-t)/86400000);
+}
+function nearEnd(m){let n=daysLeft(m);return statusOf(m)==='ACTIVE'&&n!==null&&n<=7;}
+function renewed(m){return !!m.renewed||/\brenewed\b/i.test(m.notes||'');}
+function promo(m){return !!m.promo3m||/3\s*[-]?\s*months?\s*promo/i.test(m.notes||'');}
+function money(v){return v===null||v===undefined||v===''?'—':'₱'+Number(v).toLocaleString('en-PH');}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function nextId(){
+  let max=members.reduce((a,m)=>Math.max(a,parseInt(String(m.id).replace(/\D/g,''))||0),0);
+  return 'TITAN-'+String(max+1).padStart(4,'0');
+}
+function isoFromDue(d){
+  if(!d)return '';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(d))return d;
+  let m=String(d).match(/^(\d{1,2})\/(\d{1,2})$/);
+  return m?`2026-${String(+m[1]).padStart(2,'0')}-${String(+m[2]).padStart(2,'0')}`:'';
+}
+function renderTabs(){
+  document.getElementById('tabs').innerHTML=tabs.map(([k,l])=>
+    `<button class="tab ${activeTab===k?'active':''}" onclick="activeTab='${k}';renderTabs();render()">${l} <span class="count">(${countTab(k)})</span></button>`
+  ).join('');
+}
+function countTab(k){return filterMembers(k).length;}
+function filterMembers(k=activeTab){
+  let s=(document.getElementById('search')?.value||'').toLowerCase().trim();
+  let sf=document.getElementById('statusFilter')?.value||'all';
+  return members.filter(m=>{
+    let st=statusOf(m);
+    let ok=k==='all'||
+      (k==='regular'&&m.membershipType==='Regular')||
+      (k==='student'&&m.membershipType==='Student')||
+      (k==='pt'&&m.membershipType==='Regular + PT')||
+      (k==='active'&&st==='ACTIVE')||
+      (k==='ended'&&st==='ENDED')||
+      (k==='renewed'&&renewed(m))||
+      (k==='promo'&&promo(m))||
+      (k==='new'&&m.memberStatus==='New')||
+      (k==='old'&&m.memberStatus==='Old');
+    if(!ok)return false;
+    if(sf!=='all'&&st.toLowerCase()!==sf)return false;
+    if(s){
+      let hay=[m.id,m.name,m.memberStatus,m.membershipType,m.due,m.notes,String(m.amount)].join(' ').toLowerCase();
+      if(!hay.includes(s))return false;
+    }
+    return true;
+  }).sort((a,b)=>(dateObj(a.due)||new Date(2099,0,1))-(dateObj(b.due)||new Date(2099,0,1)));
+}
+function render(){
+  let active=members.filter(m=>statusOf(m)==='ACTIVE').length;
+  let ended=members.length-active;
+  document.getElementById('mTotal').textContent=members.length;
+  document.getElementById('mActive').textContent=active;
+  document.getElementById('mEnded').textContent=ended;
+  document.getElementById('mRenewed').textContent=members.filter(renewed).length;
+  document.getElementById('mPromo').textContent=members.filter(promo).length;
+  renderTabs();
+  let arr=filterMembers();
+  let tb=document.getElementById('tbody');
+  if(!arr.length){
+    tb.innerHTML='<tr><td colspan="13" class="empty">No members found.</td></tr>';
+    return;
+  }
+  tb.innerHTML=arr.map(m=>{
+    let st=statusOf(m),n=daysLeft(m),soon=nearEnd(m);
+    let stBadge=st==='ACTIVE'?`<span class="badge b-active">ACTIVE</span>`:`<span class="badge b-ended">ENDED</span>`;
+    let extra=soon?`<span class="badge b-soon">${n===0?'ENDS TODAY':n+'d left'}</span>`:'';
+    return `<tr>
+      <td class="id">${esc(m.id)}</td>
+      <td><b>${esc(m.name)}</b>${m.cardClaimed?'<div class="muted" style="font-size:11px">Card claimed</div>':''}</td>
+      <td>${m.memberStatus==='New'?'<span class="badge b-active">NEW</span>':'<span class="badge" style="background:#eef2ff;color:#3730a3">OLD</span>'}</td>
+      <td>${esc(m.membershipType)}</td>
+      <td class="nowrap">${esc(m.due||'—')}</td>
+      <td>${n===null?'—':(n<0?'EXPIRED':n+' days')}</td>
+      <td>${stBadge} ${extra}</td>
+      <td>${renewed(m)?'<span class="badge b-renewed">RENEWED</span>':'—'}</td>
+      <td>${promo(m)?'<span class="badge b-promo">3-MONTH</span>':'—'}</td>
+      <td>${money(m.amount)}</td>
+      <td class="muted">${esc(m.notes||'')}</td>
+      <td><div class="actions"><button class="btn small" onclick="showQR('${m.id}')">View QR</button><button class="btn small" onclick="downloadMemberQR('${m.id}')">Download QR</button></div></td>
+      <td><div class="actions"><button class="btn small" onclick="openMember('${m.id}')">Edit</button><button class="btn small red" onclick="deleteMember('${m.id}')">Delete</button></div></td>
+    </tr>`;
+  }).join('');
+}
+function openMember(id){
+  editingId=id||null;
+  let m=id?members.find(x=>x.id===id):null;
+  document.getElementById('modalTitle').textContent=m?'Edit Member':'Add Member';
+  document.getElementById('fId').value=m?.id||nextId();
+  document.getElementById('fName').value=m?.name||'';
+  document.getElementById('fMemberStatus').value=m?.memberStatus||'New';
+  document.getElementById('fType').value=m?.membershipType||'Regular';
+  document.getElementById('fDue').value=isoFromDue(m?.due||'');
+  document.getElementById('fAmount').value=m?.amount??'';
+  document.getElementById('fRenewed').value=String(renewed(m||{}));
+  document.getElementById('fPromo').value=String(promo(m||{}));
+  document.getElementById('fCard').value=String(!!m?.cardClaimed);
+  document.getElementById('fNotes').value=(m?.notes||'').replace(/\bRENEWED\b/ig,'').replace(/3\s*[-]?\s*months?\s*promo/ig,'').trim();
+  document.getElementById('memberModal').classList.add('show');
+}
+async function saveMember(e){
+  e.preventDefault();
+  let id=document.getElementById('fId').value;
+  let old=members.find(x=>x.id===id);
+  let due=document.getElementById('fDue').value;
+  let notes=document.getElementById('fNotes').value.trim();
+  let ren=document.getElementById('fRenewed').value==='true';
+  let pro=document.getElementById('fPromo').value==='true';
+  if(ren)notes=(notes+' RENEWED').trim();
+  if(pro)notes=(notes+' 3months promo').trim();
+  let obj={
+    id,
+    name:document.getElementById('fName').value.trim(),
+    memberStatus:document.getElementById('fMemberStatus').value,
+    membershipType:document.getElementById('fType').value,
+    due,
+    amount:document.getElementById('fAmount').value===''?null:Number(document.getElementById('fAmount').value),
+    notes,
+    cardClaimed:document.getElementById('fCard').value==='true',
+    renewed:ren,
+    promo3m:pro,
+    pin:old?.pin||''
+  };
+  if(!obj.name||!due){alert('Please complete Name and Due Date.');return;}
+  try{
+    const action=old?'update':'add';
+    const d=await apiPost(localToApi(obj,action));
+    if(d.memberId && !old)obj.id=d.memberId;
+    members=old?members.map(x=>x.id===id?obj:x):members.concat(obj);
+    save();closeModal('memberModal');render();
+    alert('Member saved to Google Sheet.');
+  }catch(err){
+    // Keep a local copy only if cloud save fails, but make the failure explicit.
+    members=old?members.map(x=>x.id===id?obj:x):members.concat(obj);
+    save();render();
+    alert('Saved on this device, but Google Sheet save failed.\n'+(err.message||err));
+  }
+}
+async function deleteMember(id){
+  let m=members.find(x=>x.id===id);
+  if(!m)return;
+  if(!confirm('Delete '+m.name+' ('+id+')?'))return;
+  try{
+    const d=await apiPost({action:'delete',id});
+    if(!d.ok)throw Error(d.message||'Delete failed');
+    members=members.filter(x=>x.id!==id);
+    save();render();
+    alert('Member deleted from Google Sheet.');
+  }catch(err){
+    alert('Delete failed. '+(err.message||err));
+  }
+}
+function qrPayload(m){
+  return JSON.stringify({
+    app:'TITAN-GYM',
+    id:m.id,
+    name:m.name,
+    membership:m.membershipType,
+    due:m.due,
+    status:statusOf(m),
+    days:daysLeft(m),
+    renewed:renewed(m)?'YES':'NO',
+    promo:promo(m)?'YES':'NO',
+    type:m.memberStatus||'Old'
+  });
+}
+function showQR(id){
+  qrMember=members.find(x=>x.id===id);
+  if(!qrMember)return;
+  let st=statusOf(qrMember),n=daysLeft(qrMember);
+  let box=document.getElementById('qr');
+  box.innerHTML='<div class="qr-stage"><div id="qrCanvas"></div></div>';
+  if(!window.QRCode){alert('QR library not loaded.');return;}
+  new QRCode(document.getElementById('qrCanvas'),{
+    text:qrPayload(qrMember),
+    width:230,height:230,
+    colorDark:'#111827',
+    colorLight:'#ffffff',
+    correctLevel:QRCode.CorrectLevel.H
+  });
+  document.getElementById('qrCaption').textContent=
+    `SCAN THIS QR AT TITAN GYM\n${qrMember.id} • ${qrMember.name}`;
+  document.getElementById('qrMemberDetails').innerHTML=
+    `<b>Member Details</b><br>
+    Name: ${esc(qrMember.name)}<br>
+    Member ID: ${esc(qrMember.id)}<br>
+    Membership: ${esc(qrMember.membershipType)}<br>
+    Due Date: <b>${esc(qrMember.due||'—')}</b><br>
+    Status: <b>${esc(st)}</b><br>
+    Days Remaining: <b>${n===null?'—':n}</b><br>
+    Renewed: ${renewed(qrMember)?'YES':'NO'}<br>
+    3-Month Promo: ${promo(qrMember)?'YES':'NO'}<br>
+    Member Type: ${esc(qrMember.memberStatus||'Old')}`;
+  document.getElementById('qrModal').classList.add('show');
+}
+function downloadMemberQR(id){
+  let m=members.find(x=>x.id===id);if(!m)return;
+  if(!window.QRCode){alert('QR library not loaded.');return;}
+  let temp=document.createElement('div');
+  temp.style.cssText='position:fixed;left:-9999px;top:-9999px;width:260px;height:260px;background:#fff';
+  document.body.appendChild(temp);
+  new QRCode(temp,{text:qrPayload(m),width:230,height:230,colorDark:'#111827',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
+  setTimeout(()=>{
+    let canvas=temp.querySelector('canvas');
+    let img=temp.querySelector('img');
+    let aCanvas=document.createElement('canvas');aCanvas.width=230;aCanvas.height=230;
+    let ctx=aCanvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,230,230);
+    const finish=()=>{
+      const a=document.createElement('a');a.href=aCanvas.toDataURL('image/png');a.download=`TITAN-GYM-QR-${m.id}.png`;a.click();
+      temp.remove();
+    };
+    if(canvas){ctx.drawImage(canvas,0,0,230,230);finish();}
+    else if(img){let im=new Image();im.onload=()=>{ctx.drawImage(im,0,0,230,230);finish()};im.src=img.src;}
+    else {temp.remove();alert('Unable to generate QR.');}
+  },100);
+}
+function printQR(){
+  let w=window.open('','_blank');
+  let box=document.getElementById('qr').innerHTML;
+  let cap=esc(document.getElementById('qrCaption').textContent);
+  let details=document.getElementById('qrMemberDetails').innerHTML;
+  w.document.write(`<html><head><title>${esc(qrMember?.id||'TITAN QR')}</title><style>body{font-family:Arial;text-align:center;padding:30px}.qr-stage{width:230px;height:230px;margin:20px auto}img{max-width:300px}</style></head><body><h2>TITAN GYM</h2>${box}<div style="margin-top:15px;text-align:left">${details}</div><pre>${cap}</pre><script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
+}
+function parseScannedId(raw){
+  const s=String(raw||'').trim();
+  try{
+    const o=JSON.parse(s);
+    if(o&&o.id)return String(o.id).toUpperCase();
+  }catch(e){}
+  try{
+    const u=new URL(s);
+    const id=u.searchParams.get('id');
+    if(id)return String(id).toUpperCase();
+  }catch(e){}
+  const m=s.match(/TITAN-\d{4}/i);
+  return m?m[0].toUpperCase():s.toUpperCase();
+}
+async function processScan(raw){
+  const id=parseScannedId(raw);
+  if(!/^TITAN-\d{4}$/i.test(id)){
+    showScanResult('SCAN NOT RECOGNIZED','Please scan a valid Titan Gym member QR.','danger');
+    return;
+  }
+  let m=members.find(x=>x.id===id);
+  if(!m){
+    try{
+      await syncNow();
+      m=members.find(x=>x.id===id);
+    }catch(e){}
+  }
+  if(!m){
+    showScanResult('MEMBER NOT FOUND',id,'danger');
+    return;
+  }
+  // Refresh this member from the server before deciding attendance.
+  try{
+    const d=await apiGet('check',{id});
+    if(d.ok&&d.member)m=apiMemberToLocal(d.member);
+  }catch(e){}
+  const st=statusOf(m),n=daysLeft(m);
+  showScanDetails(m,st,n,'Checking attendance…','');
+  if(st!=='ACTIVE'){
+    showScanResult('ACCESS DENIED',`Membership ended. Due Date: ${m.due||'—'}`,'danger',m,st,n);
+    return;
+  }
+  try{
+    const d=await apiGet('attendance',{id,device:'QR POS'});
+    if(d.ok){
+      if(d.member)m=apiMemberToLocal(d.member);
+      // Update local member visit data without losing other fields.
+      const idx=members.findIndex(x=>x.id===id);
+      if(idx>=0)members[idx]={...members[idx],...m,lastVisit:new Date().toISOString(),totalVisits:Number(m.totalVisits||members[idx].totalVisits||0)};
+      save();render();
+      showScanResult('ACCESS GRANTED',`Check-in saved. ${n===0?'Membership ends today.':n+' days remaining.'}`,'success',m,'ACTIVE',daysLeft(m));
+    }else if(String(d.message||'').toUpperCase().includes('ALREADY CHECKED IN')){
+      showScanResult('ALREADY CHECKED IN TODAY','This member has already scanned today. A second scan is not allowed, even from another device.','danger',m,'ACTIVE',daysLeft(m));
+    }else{
+      showScanResult('CHECK-IN NOT SAVED',d.message||'Unknown server response','danger',m,st,n);
+    }
+  }catch(e){
+    showScanResult('SYNC ERROR','Could not save attendance to Google Sheet. '+(e.message||e),'danger',m,st,n);
+  }
+}
+function showScanDetails(m,st,n,msg,cls){
+  showScanResult(msg,`Name: ${m.name}`,cls,m,st,n);
+}
+function showScanResult(title,msg,cls='',m=null,st='',n=null){
+  const el=document.getElementById('scanResult');
+  if(!el)return;
+  const badge=cls==='success'?'b-active':cls==='danger'?'b-ended':'b-soon';
+  el.innerHTML=`<div style="font-size:22px;font-weight:900;margin-bottom:8px">${esc(title)}</div>
+    <div style="font-size:14px;margin-bottom:10px">${esc(msg)}</div>
+    ${m?`<div style="background:#f8fafc;border-radius:12px;padding:12px;text-align:left">
+      <b>${esc(m.name)}</b><br>
+      Member ID: ${esc(m.id)}<br>
+      Membership: ${esc(m.membershipType)}<br>
+      Due Date: <b>${esc(m.due||'—')}</b><br>
+      Days Remaining: <b>${n===null?'—':n}</b><br>
+      Status: <span class="badge ${badge}">${esc(st||statusOf(m))}</span>
+    </div>`:''}`;
+  el.className='note '+cls;
+}
+async function startScanner(){
+  if(scanning)return;
+  if(!window.Html5Qrcode){alert('QR scanner library is not loaded. Please connect to the internet and reload the POS.');return;}
+  try{
+    scanner=new Html5Qrcode('qrReader');
+    const devices=await Html5Qrcode.getCameras();
+    if(!devices||!devices.length)throw Error('No camera found.');
+    const preferred=devices.find(d=>/back|rear|environment/i.test(d.label))||devices[devices.length-1];
+    await scanner.start(
+      preferred.id,
+      {fps:10,qrbox:{width:240,height:240}},
+      async decodedText=>{
+        await stopScanner();
+        await processScan(decodedText);
+      },
+      ()=>{}
+    );
+    scanning=true;
+    document.getElementById('scanStatus').textContent='Scanner is ON — point the camera at the member QR.';
+  }catch(e){
+    scanning=false;
+    alert('Unable to start camera scanner. '+(e.message||e));
+  }
+}
+async function stopScanner(){
+  if(scanner){
+    try{await scanner.stop();}catch(e){}
+    try{scanner.clear();}catch(e){}
+  }
+  scanner=null;scanning=false;
+  const s=document.getElementById('scanStatus');
+  if(s)s.textContent='Scanner is OFF.';
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('show');
+}
+function importJSONClick(){document.getElementById('jsonFile').click();}
+function importJSON(e){
+  let f=e.target.files[0];if(!f)return;
+  let r=new FileReader();
+  r.onload=async()=>{
+    try{
+      let d=JSON.parse(r.result);
+      let arr=Array.isArray(d)?d:d.members;
+      if(!Array.isArray(arr))throw Error('Invalid backup');
+      members=arr.map(x=>({...x,memberStatus:x.memberStatus||'Old'}));
+      save();render();
+      await uploadAllToSheet();
+      alert('Backup restored and uploaded to Google Sheet.');
+    }catch(err){alert('Import failed. '+(err.message||err));}
+  };
+  r.readAsText(f);e.target.value='';
+}
+function exportJSON(){
+  let blob=new Blob([JSON.stringify({app:'Titan Gym Member POS',version:3,exportedAt:new Date().toISOString(),members},null,2)],{type:'application/json'});
+  download(blob,'titan-gym-backup-'+stamp()+'.json');
+}
+function csvEscape(v){let s=String(v??'');return '"'+s.replace(/"/g,'""')+'"';}
+function exportCSV(){
+  let cols=['Member ID','Name','Member Status','Membership Type','Due Date','Days Remaining','Status','Renewed','3-Month Promo','Amount','Notes','Card Claimed'];
+  let lines=[cols.map(csvEscape).join(',')];
+  members.forEach(m=>lines.push([m.id,m.name,m.memberStatus||'Old',m.membershipType,m.due,daysLeft(m)??'',statusOf(m),renewed(m)?'YES':'NO',promo(m)?'YES':'NO',m.amount??'',m.notes||'',m.cardClaimed?'YES':'NO'].map(csvEscape).join(',')));
+  download(new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'}),'titan-gym-members.csv');
+}
+function xmlEsc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function sheet(name,headers,rows){
+  let s=`<Worksheet ss:Name="${xmlEsc(name)}"><Table><Row>${headers.map(h=>`<Cell><Data ss:Type="String">${xmlEsc(h)}</Data></Cell>`).join('')}</Row>`;
+  rows.forEach(r=>{s+='<Row>'+r.map(v=>`<Cell><Data ss:Type="String">${xmlEsc(v)}</Data></Cell>`).join('')+'</Row>';});
+  return s+'</Table></Worksheet>';
+}
+function exportExcel(){
+  const headers=['Member ID','Name','Member Status','Membership Type','Due Date','Days Remaining','Status','Renewed','3-Month Promo','Amount','Notes','Card Claimed'];
+  const makeRows=list=>list.map(m=>({
+    'Member ID':m.id,'Name':m.name,'Member Status':m.memberStatus||'Old','Membership Type':m.membershipType,
+    'Due Date':m.due,'Days Remaining':daysLeft(m)??'','Status':statusOf(m),
+    'Renewed':renewed(m)?'YES':'NO','3-Month Promo':promo(m)?'YES':'NO',
+    'Amount':m.amount??'','Notes':m.notes||'','Card Claimed':m.cardClaimed?'YES':'NO'
+  }));
+  const sheets={
+    'All Members':makeRows(members),
+    'Active Members':makeRows(members.filter(m=>statusOf(m)==='ACTIVE')),
+    'Regular':makeRows(members.filter(m=>m.membershipType==='Regular')),
+    'Regular + PT':makeRows(members.filter(m=>m.membershipType==='Regular + PT')),
+    'Student':makeRows(members.filter(m=>m.membershipType==='Student')),
+    '3-Month Promo':makeRows(members.filter(promo)),
+    'Ended':makeRows(members.filter(m=>statusOf(m)==='ENDED'))
+  };
+  if(window.XLSX){
+    const wb=XLSX.utils.book_new();
+    Object.entries(sheets).forEach(([name,rows])=>{
+      const ws=XLSX.utils.json_to_sheet(rows,{header:headers});
+      XLSX.utils.book_append_sheet(wb,ws,name.slice(0,31));
+    });
+    const summary=[
+      ['Export Date',new Date().toLocaleString()],
+      ['Total Members',members.length],
+      ['Active Members',members.filter(m=>statusOf(m)==='ACTIVE').length],
+      ['Regular',members.filter(m=>m.membershipType==='Regular').length],
+      ['Student',members.filter(m=>m.membershipType==='Student').length],
+      ['Regular + PT',members.filter(m=>m.membershipType==='Regular + PT').length],
+      ['3-Month Promo',members.filter(promo).length],
+      ['Ended',members.filter(m=>statusOf(m)==='ENDED').length]
+    ];
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(summary),'SUMMARY');
+    XLSX.writeFile(wb,'Titan_Gym_POS_Members.xlsx');
+    return;
+  }
+  alert('Excel library is still loading. Please tap Excel Export again.');
+}
+function download(blob,name){
+  let a=document.createElement('a');
+  if(typeof blob==='string'){a.href=blob;}else{a.href=URL.createObjectURL(blob);}
+  a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{if(blob instanceof Blob)URL.revokeObjectURL(a.href);a.remove();},500);
+}
+function stamp(){return new Date().toISOString().replace(/[:.]/g,'-');}
+
+load();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script></body></html>
